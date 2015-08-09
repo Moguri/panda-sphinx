@@ -1,0 +1,1 @@
+for a in pages/*; do b=${a/.txt/.rst}; b=pages-step1/${b#pages/}; ./convert.py "$a" > "$b"; done
