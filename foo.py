@@ -1,6 +1,7 @@
 from lxml import etree
+import sys
 
-with open("Panda3D+Manual-20150808210716.xml") as f:
+with open(sys.argv[1]) as f:
    root = etree.parse(f)
 
 NS = dict(e = "http://www.mediawiki.org/xml/export-0.6/")

@@ -2,12 +2,14 @@
 
 errors=0
 
+echo
+
 for a in pages/*; do 
   b=${a/.txt/.rst}
   b=pages-step1/${b#pages/}
-  echo -ne "\e[1Gconverting \e[1m$a\e[m\e[K"
+  echo -e "\e[1Fconverting \e[1m$a\e[m\e[K"
   if ! ./convert.py "$a" > "$b"; then
-    echo -e "Failure at \e[1m$a\e[m"
+    echo
     errors=$((errors + 1))
   fi
 done
