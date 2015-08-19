@@ -7,6 +7,7 @@ import subprocess
 from bs4 import BeautifulSoup
 from bs4.element import *
 from hashlib import sha1
+from toolz import curry
 
 KEEP=["b", "i", "u", "strong", "em", "blockquote", "sub", "sup"]
 CODE=["code", "pre", "syntaxhighlight"]
@@ -25,6 +26,18 @@ CONTENTS = dict()
 # set to '--columns=72' to allow wrapping
 NOWRAP = '--columns=78' #'--no-wrap'
 
+def replacer(char_follows):
+
+    def matcher(match):
+        conv = CONTENTS[match.group(1)]
+        res = conv.output()
+        if char_follows and not re.search(r"\s$", res):
+            res += " "
+        return res
+
+    return matcher
+
+
 
 class Converter(object):
     def __init__(self, elem):
@@ -35,13 +48,15 @@ class Converter(object):
 
 class HTML(Converter):
     def output(self):
-        self.pipe = subprocess.Popen(['pandoc', '-fhtml', '-trst', '-F./filter.py', NOWRAP], stdin=subprocess.PIPE, stdout=subprocess.PIPE)
-        return self.pipe.communicate(str(self.elem).encode("utf-8"))[0].decode("utf-8")
-
+        self.pipe = subprocess.Popen(['pandoc', '-fhtml', '-trst', '-F./filter.py', '--normalize', NOWRAP], stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+        #print(self.elem.prettify(encoding="ascii", formatter="minimal").decode("ascii"))
+        res = self.pipe.communicate(str(self.elem).encode("utf-8"))[0].decode("utf-8")
+        return res
+    
+        
 class LangSwitch(Converter):
     def output(self):
         pipe = Pandoc().convert(self.elem)
-
 
         res = ["""
 
@@ -50,10 +65,17 @@ class LangSwitch(Converter):
 """.format(self.elem.name)]
 
         for line in pipe.stdout:
-            translated_line = re.sub(r"XXXREPLACE-([0-9a-f]+)XXX *", replacer, line.decode("utf-8"))
+            translated_line = replace_placeholders(line.decode("utf-8"))
             res.extend('    ' + tl for tl in translated_line.splitlines(True))
 
         return "".join(res)    
+
+
+
+def replace_placeholders(line):
+    translated_line = re.sub(r"XXXREPLACE-([0-9a-f]+)XXX *(?=\w)", replacer(char_follows=True), line)
+    translated_line = re.sub(r"XXXREPLACE-([0-9a-f]+)XXX *(?!\w)", replacer(char_follows=False), translated_line)
+    return translated_line
 
     
 class Code(Converter):
@@ -80,8 +102,9 @@ class Code(Converter):
             raise RuntimeError("invalid code object "+str(self.elem))
         if self.elem.attrs and self.elem.name != "pre":
             lang = str(list(self.elem.attrs.keys())[0])
-            if self.elem.name == "syntaxhighlight":
+            if self.elem.has_attr("lang"):
                 lang = self.elem["lang"]
+            assert lang != "lang", "invalid lang for elem"+str(self.elem)
             r.append("\n\n.. code-block:: " + self.convert_langtag(lang) + "\n")
             code = str(self.elem.string)
             if not code.startswith("\n"):
@@ -156,7 +179,7 @@ class Pandoc(object):
 
 
     def convert(self, root):
-        self.pipe = subprocess.Popen(["pandoc", "-fmediawiki", "-trst", '-F./filter.py', NOWRAP], stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+        self.pipe = subprocess.Popen(["pandoc", "-fmediawiki", "-trst", '-F./filter.py', '--normalize', NOWRAP], stdin=subprocess.PIPE, stdout=subprocess.PIPE)
         #pipe = subprocess.Popen(["cat"], stdin=subprocess.PIPE, stdout=subprocess.PIPE)
 
         for elem in root:
@@ -242,9 +265,6 @@ root = BeautifulSoup(data, 'html.parser')
 
 pipe = Pandoc().convert(root)
 
-def replacer(match):
-    conv = CONTENTS[match.group(1)]
-    return conv.output()
 
 if True:
         
@@ -268,5 +288,5 @@ for i, line in enumerate(pipe.stdout):
     line = line.replace('XXXLT', '<')
     #sys.stdout.write(line)
 
-    sys.stdout.write(re.sub(r"XXXREPLACE-([0-9a-f]+)XXX *", replacer, line))
+    sys.stdout.write(replace_placeholders(line))
 
