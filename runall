@@ -4,9 +4,11 @@ errors=0
 
 echo
 
+mkdir source
+
 for a in pages/*; do 
   b=${a/.txt/.rst}
-  b=pages-step1/${b#pages/}
+  b=source/${b#pages/}
   echo -e "\e[1Fconverting \e[1m$a\e[m\e[K"
   if ! ./convert.py "$a" > "$b"; then
     echo

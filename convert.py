@@ -9,6 +9,8 @@ from bs4.element import *
 from hashlib import sha1
 from toolz import curry
 
+from common import transform_title
+
 KEEP=["b", "i", "u", "strong", "em", "blockquote", "sub", "sup"]
 CODE=["code", "pre", "syntaxhighlight"]
 REMOVE=["div", "span", "html", "head", "body", "p", "font", "big"]
@@ -58,11 +60,15 @@ class LangSwitch(Converter):
     def output(self):
         pipe = Pandoc().convert(self.elem)
 
+        lang = self.elem.name
+        if lang == 'cxx':
+            lang = 'c++'
+
         res = ["""
 
 .. only:: {}
 
-""".format(self.elem.name)]
+""".format(lang)]
 
         for line in pipe.stdout:
             translated_line = replace_placeholders(line.decode("utf-8"))
@@ -278,7 +284,7 @@ if True:
 
 """)
 
-    title = sys.argv[1].split("/")[-1].replace(".txt", "").replace(" ", "-").replace('"', '').lower()
+    title = transform_title(sys.argv[1].split("/")[-1].replace(".txt", ""))
 
     sys.stdout.write(".. _{}:\n\n".format(title))
 

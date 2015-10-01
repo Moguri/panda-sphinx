@@ -1,0 +1,23 @@
+Requirements, besides pandoc and sphinx:
+
+    pip3 install beautifulsoup4 toolz
+
+To convert, first grab an xml export of the manual:
+
+    wget https://www.panda3d.org/manual/dump.xml
+
+Extract pages from it:
+
+    rm -rf pages/
+    python3 foo.py dump.xml
+
+Then run the conversion to ReST:
+
+    rm -rf source/
+    ./runall
+
+Now for the sphinx step:
+
+    make html
+
+The result will be available at: build/html/main-page.html
