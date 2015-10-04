@@ -96,6 +96,7 @@ class Code(Converter):
             "html4strict": "html",
             "prc": "text",
             "cg": "glsl", # not 100% correct, but who cares
+            "egg": "text",
         }
         try:
             return mapped[lang]
@@ -193,11 +194,8 @@ class Pandoc(object):
 
         self.pipe.stdin.close()
         return self.pipe
-    
-with open(sys.argv[1], "rt", encoding="utf-8") as f:
-    data = f.read()
 
-    
+
 class CData:
     def __init__(self, s, sections):
         self.s = s
@@ -221,12 +219,31 @@ def save_and_replace_cdata(s):
     replaced = re.sub(r"(<!\[CDATA\[.*?\]\]>)", replace, s, flags=re.M|re.DOTALL)
     return CData(replaced, content)
 
-    
-    
-# fix borked code
+
+if len(sys.argv) >= 2 and sys.argv[1] != '-':
+    infile = open(sys.argv[1], "rt", encoding="utf-8")
+else:
+    infile = sys.stdin
+
+with sys.stdin as f:
+    data = f.read()
+
+# replace weird python/c++ tags
+data = data.replace('[;]', '')
+data = data.replace('[::]', '.')
+data = data.replace('[->]', '.')
+data = data.replace('[func]', '')
+data = data.replace('[/func]', '')
+
+# Canonicalize Panda3D site URLs.
+data = re.sub(r'https?://(www\.)?panda3d\.[orgnetcm]+(\.cmu\.edu)?', 'https://www.panda3d.org', data)
+data = data.replace('//www.panda3d.org/phpbb2', '//www.panda3d.org/forums')
+data = data.replace('//www.panda3d.org/wiki', '//www.panda3d.org/manual')
+
+#data = data.replace("<code cxx>", '<code cpp>')
+#data = re.sub(r'<code ([a-z]+)>(.*?)</code>', r'<syntaxhighlight lang="\1">\2</syntaxhighlight>', data)
 
 # convert mediawiki tags to html (and also the python/cxx pseudotags)
-
 data = re.sub(r"\[(/?(code|python|cxx))\]", r"<\1>", data)
 
 # add CDATA to code blocks
@@ -272,8 +289,7 @@ root = BeautifulSoup(data, 'html.parser')
 pipe = Pandoc().convert(root)
 
 
-if True:
-        
+if False:
     sys.stdout.write("""..
   This file was automatically converted from MediaWiki syntax.
   If some markup is wrong, looks weird or doesn't make sense, feel free
@@ -283,10 +299,6 @@ if True:
   and no "strange ReST" artifacts remain.
 
 """)
-
-    title = transform_title(sys.argv[1].split("/")[-1].replace(".txt", ""))
-
-    sys.stdout.write(".. _{}:\n\n".format(title))
 
 for i, line in enumerate(pipe.stdout):
     line = line.decode("utf-8")

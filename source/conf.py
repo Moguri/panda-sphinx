@@ -28,7 +28,7 @@ import os
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
-extensions = []
+extensions = ['sphinx.ext.autodoc']
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -40,7 +40,7 @@ source_suffix = '.rst'
 #source_encoding = 'utf-8-sig'
 
 # The master toctree document.
-master_doc = 'main-page'
+master_doc = 'index'
 
 # General information about the project.
 project = u'Panda3D'
@@ -192,7 +192,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-  ('main-page', 'Panda3D.tex', u'Panda3D Documentation',
+  ('index', 'Panda3D.tex', u'Panda3D Documentation',
    u'Panda3D', 'manual'),
 ]
 
@@ -222,7 +222,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    ('main-page', 'panda3d', u'Panda3D Documentation',
+    ('index', 'panda3d', u'Panda3D Documentation',
      [u'Panda3D'], 1)
 ]
 
@@ -236,7 +236,7 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-  ('main-page', 'Panda3D', u'Panda3D Documentation',
+  ('index', 'Panda3D', u'Panda3D Documentation',
    u'Panda3D', 'Panda3D', 'One line description of project.',
    'Miscellaneous'),
 ]
@@ -252,3 +252,10 @@ texinfo_documents = [
 
 # If true, do not generate a @detailmenu in the "Top" node's menu.
 #texinfo_no_detailmenu = False
+
+
+autodoc_mock_import = [
+    'direct.directbase.DirectStart',
+    'direct.directbase.ThreeUpStart',
+    'direct.directbase.TestStart',
+]

@@ -4,17 +4,13 @@ Requirements, besides pandoc and sphinx:
 
 To convert, first grab an xml export of the manual:
 
+    rm -f dump.xml
     wget https://www.panda3d.org/manual/dump.xml
 
-Extract pages from it:
+Extract pages from it and convert them to RestructuredText:
 
-    rm -rf pages/
+    rm -rf source/*/ source/*.rst
     python3 foo.py dump.xml
-
-Then run the conversion to ReST:
-
-    rm -rf source/
-    ./runall
 
 Now for the sphinx step:
 
