@@ -12,7 +12,7 @@ redirects = json.load(open('redirects.json'))
 def convert_links(key, value, format, meta):
     if key == 'Link':
         title = stringify(value[0])
-        target, target_type = value[1]
+        target, target_type = value[2]
 
         if target_type == 'wikilink':
             target = target.replace('_', ' ')
@@ -39,6 +39,6 @@ def convert_links(key, value, format, meta):
 
     elif key == 'Image':
         # remove caption, replace space with underscore
-        return Image([], [transform_title(x) for x in value[1]])
+        return Image(value[0], value[1], [transform_title(x) for x in value[2]])
 
 toJSONFilter(convert_links)
