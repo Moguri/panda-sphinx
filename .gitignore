@@ -3,3 +3,6 @@
 /build/
 *.pyc
 *.pyo
+/dump.xml
+/toctree.json
+/redirects.json
