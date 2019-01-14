@@ -78,7 +78,9 @@ json.dump(redirects, open('redirects.json', 'w'))
 
 
 # Convert all of the other pages.
-for page in pages:
+for i, page in enumerate(pages):
+    progress = (100 * i) // (len(pages) - 1)
+
     title = page.xpath("e:title/text()", namespaces=NS)[0]
     if title in redirects:
         # Ignore redirects.
@@ -130,7 +132,7 @@ for page in pages:
 
     with open("source/{}.rst".format(path), "wb") as f:
         #print("converting %s" % (path))
-        print("\x1b[1Fconverting \x1b[1m%s\x1b[m\x1b[K" % (path))
+        print("\x1b[1Fconverting [%+3s%%] \x1b[1m%s\x1b[m\x1b[K" % (progress, path))
 
         # Write an anchor so we can refer to this page.
         f.write(".. _{}:\n\n".format(transformed).encode('utf-8'))
