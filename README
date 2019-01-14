@@ -1,6 +1,6 @@
 Requirements, besides pandoc and sphinx:
 
-    pip3 install beautifulsoup4 toolz
+    pip3 install beautifulsoup4 toolz lxml pandocfilters
 
 To convert, first grab an xml export of the manual:
 
