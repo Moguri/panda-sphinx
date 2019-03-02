@@ -50,7 +50,7 @@ class Converter(object):
 
 class HTML(Converter):
     def output(self):
-        self.pipe = subprocess.Popen(['pandoc', '-fhtml', '-trst', '-F./filter.py', '--normalize', NOWRAP], stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+        self.pipe = subprocess.Popen(['pandoc', '-fhtml', '-trst', '-F./filter.py', NOWRAP], stdin=subprocess.PIPE, stdout=subprocess.PIPE)
         #print(self.elem.prettify(encoding="ascii", formatter="minimal").decode("ascii"))
         res = self.pipe.communicate(str(self.elem).encode("utf-8"))[0].decode("utf-8")
         return res
@@ -186,7 +186,7 @@ class Pandoc(object):
 
 
     def convert(self, root):
-        self.pipe = subprocess.Popen(["pandoc", "-fmediawiki", "-trst", '-F./filter.py', '--normalize', NOWRAP], stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+        self.pipe = subprocess.Popen(["pandoc", "-fmediawiki", "-trst", '-F./filter.py', NOWRAP], stdin=subprocess.PIPE, stdout=subprocess.PIPE)
         #pipe = subprocess.Popen(["cat"], stdin=subprocess.PIPE, stdout=subprocess.PIPE)
 
         for elem in root:
@@ -251,14 +251,14 @@ data = re.sub(r"(<(code|pre|syntaxhighlight).*?>)(.*?)(</\2>)", r"\1<![CDATA[\3]
 
 
 # pandoc gets confused if we use any form of < tag, even if it is written as &lt;
-# (because of multiple passes, so we replace them with our own tag XXXLT
+# (because of multiple passes, so we replace them with our own tag "\2" (instead of XXXLT)
 
 
 
 # fix text that looks like tags
 # some end with >, some don't, because we want for example to replace <object> but not <object ...> (the latter occurs in a code block which
 # is already handled via CDATA
-data = re.sub(r"<(your|object>|char>|event name>|function>|solid|parameters|param>|RGBA>|character's)", r"XXXLT\1", data, flags=re.I)
+data = re.sub(r"<(your|object>|char>|event name>|function>|solid|parameters|param>|RGBA>|character's)", r"{}\1".format('\2'), data, flags=re.I)
 
 
 
@@ -271,7 +271,7 @@ data = re.sub(r"""
 <(BFace|Billboard|Bundle|Collide|Comment|CoordinateSystem|Dart|DCS|Distance|Dxyz|DynamicVertexPool|
 Entry-type|Group|Instance|Joint|Material|Model|MRef|MyClass|Normal|NurbsCurve|ObjectType|Polygon|Ref|S\$Anim|
 Scalar|Switch|SwitchCondition|T|Tag|Texture|Transform|TRef|UV|V|Vertex|VertexPool|VertexRef
-)>""", r"XXXLT\1>", cdata.s, flags=re.I|re.M|re.VERBOSE)
+)>""", r"{}\1>".format('\2'), cdata.s, flags=re.I|re.M|re.VERBOSE)
 
 
 data = cdata.restore(data)
@@ -303,7 +303,7 @@ if False:
 for i, line in enumerate(pipe.stdout):
     line = line.decode("utf-8")
     # restore escaped <
-    line = line.replace('XXXLT', '<')
+    line = line.replace('\2', '<')
     #sys.stdout.write(line)
 
     sys.stdout.write(replace_placeholders(line))
