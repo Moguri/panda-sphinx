@@ -11,7 +11,7 @@ redirects = json.load(open('redirects.json'))
 
 def convert_links(key, value, format, meta):
     if key == 'Link':
-        title = stringify(value[0])
+        title = stringify(value[1])
         target, target_type = value[2]
 
         if target_type == 'wikilink':
@@ -30,7 +30,6 @@ def convert_links(key, value, format, meta):
             #assert get_page_path(target), target
 
             target_ref = transform_title(target)
-
             if title == target:
                 #return RawInline('rst', title)
                 return RawInline('rst', ':ref:`{}`'.format(target_ref))

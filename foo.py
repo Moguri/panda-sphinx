@@ -16,25 +16,6 @@ ignore_namespaces = ['Category', 'Dev', 'File', 'Help', 'MediaWiki',
 if not os.path.isdir('pages'):
     os.mkdir('pages')
 
-if not os.path.isdir('source/_static'):
-    os.mkdir('source/_static')
-
-with open('source/_static/theme_overrides.css', 'w') as f:
-    f.write("""/* override table width restrictions */
-@media screen and (min-width: 767px) {
-
-   .wy-table-responsive table td {
-      /* !important prevents the common CSS stylesheets from overriding
-         this as on RTD they are loaded after this stylesheet */
-      white-space: normal !important;
-   }
-
-   .wy-table-responsive {
-      overflow: visible !important;
-   }
-}
-""")
-
 # Parse the MediaWiki xml dump.
 with open(sys.argv[1]) as f:
     root = etree.parse(f)

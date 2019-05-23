@@ -62,7 +62,7 @@ class LangSwitch(Converter):
 
         lang = self.elem.name
         if lang == 'cxx':
-            lang = 'c++'
+            lang = 'cpp'
 
         res = ["""
 

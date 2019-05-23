@@ -1,5 +1,8 @@
 /__pycache__/
-/source/*.rst
+/source/*
+!/source/conf.py
+!/source/requirements.txt
+!/source/_static
 /build/
 *.pyc
 *.pyo
