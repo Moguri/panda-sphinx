@@ -186,7 +186,7 @@ class Pandoc(object):
 
 
     def convert(self, root):
-        self.pipe = subprocess.Popen(["pandoc", "-fmediawiki", "-trst", '-F./filter.py', NOWRAP], stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+        self.pipe = subprocess.Popen(["pandoc", "-fmediawiki-auto_identifiers", "-trst", '-F./filter.py', NOWRAP], stdin=subprocess.PIPE, stdout=subprocess.PIPE)
         #pipe = subprocess.Popen(["cat"], stdin=subprocess.PIPE, stdout=subprocess.PIPE)
 
         for elem in root:
