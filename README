@@ -1,6 +1,6 @@
 Requirements, besides pandoc and sphinx:
 
-    pip3 install beautifulsoup4 toolz lxml pandocfilters
+    pip3 install beautifulsoup4 toolz lxml pandocfilters sphinx-variations
 
 To convert, first grab an xml export of the manual:
 
@@ -9,7 +9,6 @@ To convert, first grab an xml export of the manual:
 
 Extract pages from it and convert them to RestructuredText:
 
-    rm -rf source/*/ source/*.rst
     python3 foo.py dump.xml
 
 Now for the sphinx step:
